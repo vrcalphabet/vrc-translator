@@ -1,0 +1,27 @@
+{
+  "name": "vrc-translator",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "vrc 公式サイト日本語化プロジェクト",
+  "main": "dist/background.js",
+  "scripts": {
+    "compile": "npx webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vrcalphabet/vrc-translator.git"
+  },
+  "author": "vrcalpha",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/vrcalphabet/vrc-translator/issues"
+  },
+  "homepage": "https://github.com/vrcalphabet/vrc-translator#readme",
+  "devDependencies": {
+    "@types/chrome": "^0.0.301",
+    "ts-loader": "^9.5.2",
+    "typescript": "^5.7.3",
+    "webpack": "^5.97.1",
+    "webpack-cli": "^6.0.1"
+  }
+}
