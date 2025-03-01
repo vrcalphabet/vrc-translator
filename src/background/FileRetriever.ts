@@ -42,7 +42,7 @@ export default class FileRetriever {
     const res = await fetch(url, { cache: 'no-cache' });
     // ファイルが存在しない場合
     if (!res.ok) {
-      console.error(`${fileName} がサーバから取得できませんでした。`);
+      console.error(`${fileName} をサーバから取得できませんでした。`);
       return null;
     }
 
