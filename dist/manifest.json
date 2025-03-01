@@ -2,7 +2,7 @@
   "$schema": "https://json.schemastore.org/chrome-manifest.json",
   "manifest_version": 3,
   "name": "vrc 公式サイト日本語化アドオン",
-  "version": "1.1",
+  "version": "1.2",
   "background": {
     "service_worker": "background.js"
   },
@@ -10,5 +10,7 @@
     "matches": ["*://vrchat.com/*"],
     "js": ["script.js"]
   }],
-  "permissions": ["storage", "unlimitedStorage"]
+  "options_page": "options.html",
+  "permissions": ["storage", "unlimitedStorage"],
+  "host_permissions": ["<all_urls>"]
 }
