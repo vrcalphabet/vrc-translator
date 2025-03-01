@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/vrcalphabet/vrc-translator#readme",
   "devDependencies": {
-    "@types/chrome": "^0.0.301",
+    "@types/chrome": "^0.0.307",
     "ts-loader": "^9.5.2",
     "typescript": "^5.7.3",
     "webpack": "^5.97.1",
