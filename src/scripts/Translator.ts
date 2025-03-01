@@ -68,7 +68,7 @@ export default class Translator {
   }
 
   private findTransNode(transNode: TransTypes.TransNode, source: string): string | null {
-    if (transNode.source.toLowerCase() === source.toLowerCase()) {
+    if (transNode.source === source.toLowerCase()) {
       return transNode.trans;
     } else {
       return null;
