@@ -9,7 +9,8 @@ export type RuleNode = {
   xpath: string;
   multi: boolean;
   attribute: string | null;
+  custom: string | null;
 };
 
-export type RulePathList = Array<string>;
+export type RulePathList = Array<RegExp>;
 export type RuleNodeList = Array<RuleNode>;

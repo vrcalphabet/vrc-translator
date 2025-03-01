@@ -5,13 +5,14 @@ export default class ElementFinder {
     const result: ResultTypes.Result = [];
 
     for (const node of nodes) {
-      const { key, xpath, multi, attribute } = node;
+      const { key, xpath, multi, attribute, custom } = node;
       const elements = this.query(xpath, multi);
 
       if (elements.length === 0) continue;
       result.push({
         key: key,
         attribute: attribute,
+        custom: custom,
         nodes: elements,
       });
     }
