@@ -7,7 +7,8 @@ const __dirname = path.dirname(__filename);
 export default {
   entry: {
     background: './src/background',
-    script: './src/scripts'
+    script: './src/scripts',
+    options: './src/options',
   },
   output: {
     path: path.resolve(__dirname, 'dist'),

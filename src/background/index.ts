@@ -1,10 +1,15 @@
+import Storage from '../utils/Storage';
 import DataUpdater from './DataUpdater';
 
 /**
  * サービスワーカー起動時に実行される関数
  */
-function initialize(): void {
+async function initialize(): Promise<void> {
   console.log('拡張機能がアクティベートされました。');
+
+  if (await Storage.get('host') === undefined) {
+    await Storage.set('host', 'https://vrcalphabet.github.io/vrc-transition/');
+  }
 
   // 30分ごとに更新を確認する
   const min30 = 1000 * 60 * 30;

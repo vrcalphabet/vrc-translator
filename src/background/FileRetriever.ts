@@ -1,7 +1,6 @@
 import TimeLogger from '../utils/TimeLogger';
 
 export default class FileRetriever {
-  private static readonly baseURL = 'https://vrcalphabet.github.io/vrc-transition/';
   private static timeLogger = new TimeLogger(
     '"$<name>"をサーバから$<time>ミリ秒かけて取得しました。データサイズ: $<size>バイト'
   );
@@ -10,24 +9,24 @@ export default class FileRetriever {
    * 最終更新時刻をサーバから取得します。
    * @returns 最終更新時刻
    */
-  public static async getLastUpdate() {
-    return this.getContent('lastUpdate.txt');
+  public static async getLastUpdate(baseURL: string): Promise<string | null> {
+    return this.getContent(baseURL, 'lastUpdate.txt');
   }
 
   /**
    * 最新の翻訳データをサーバから取得します。
    * @returns 翻訳データ
    */
-  public static async getTrans() {
-    return this.getContent('trans.json');
+  public static async getTrans(baseURL: string): Promise<string | null> {
+    return this.getContent(baseURL, 'trans.json');
   }
 
   /**
    * 最新のルールデータをサーバから取得します。
    * @returns ルールデータ
    */
-  public static async getRule() {
-    return this.getContent('rule.json');
+  public static async getRule(baseURL: string): Promise<string | null> {
+    return this.getContent(baseURL, 'rule.json');
   }
 
   /**
@@ -35,10 +34,10 @@ export default class FileRetriever {
    * @param fileName ファイル名
    * @returns ファイルの中身、ファイルが存在しない場合などはnull。
    */
-  private static async getContent(fileName: string): Promise<string | null> {
+  private static async getContent(baseURL: string, fileName: string): Promise<string | null> {
     this.timeLogger.start(fileName);
 
-    const url = this.getURL(fileName);
+    const url = this.getURL(baseURL, fileName);
     const res = await fetch(url, { cache: 'no-cache' });
     // ファイルが存在しない場合
     if (!res.ok) {
@@ -57,8 +56,8 @@ export default class FileRetriever {
    * @param fileName ファイル名
    * @returns ベースのURLとファイル名が結合されたURL
    */
-  private static getURL(fileName: string): string {
-    const url = new URL(fileName, this.baseURL);
+  private static getURL(baseURL: string, fileName: string): string {
+    const url = new URL(fileName, baseURL);
     return url.href;
   }
 }

@@ -2,7 +2,11 @@ import FileRetriever from './FileRetriever';
 import Storage from '../utils/Storage';
 
 export default class DataUpdater {
+  private static baseURL: string;
+  
   public static async checkUpdate(): Promise<void> {
+    this.baseURL = (await Storage.get('host'))!;
+    
     /** 更新が必要かどうか */
     const needsUpdate = await this.needsUpdate();
     if (needsUpdate) {
@@ -31,7 +35,7 @@ export default class DataUpdater {
     }
 
     /** サーバの最終更新時刻 */
-    const serverLastUpdate = await FileRetriever.getLastUpdate();
+    const serverLastUpdate = await FileRetriever.getLastUpdate(this.baseURL);
     // 何らかのエラー（サーバダウン状態、ネットワーク未接続等）
     if (serverLastUpdate === null) {
       return false;
@@ -42,11 +46,11 @@ export default class DataUpdater {
   }
 
   private static async update(): Promise<boolean> {
-    const lastUpdate = await FileRetriever.getLastUpdate();
+    const lastUpdate = await FileRetriever.getLastUpdate(this.baseURL);
     if (lastUpdate === null) return false;
-    const rule = await FileRetriever.getRule();
+    const rule = await FileRetriever.getRule(this.baseURL);
     if (rule === null) return false;
-    const trans = await FileRetriever.getTrans();
+    const trans = await FileRetriever.getTrans(this.baseURL);
     if (trans === null) return false;
 
     Storage.set('lastUpdate', lastUpdate);
