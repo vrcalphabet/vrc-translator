@@ -16,7 +16,7 @@ export default class RuleFilter {
   }
 
   private contains(ruleGroup: RuleTypes.RuleGroup): boolean {
-    return this.includes(ruleGroup.includes) && !this.excludes(ruleGroup.excludes);
+    return this.includes(ruleGroup.includes) && this.excludes(ruleGroup.excludes);
   }
 
   private includes(rulePathList: RuleTypes.RulePathList): boolean {
@@ -24,6 +24,6 @@ export default class RuleFilter {
   }
 
   private excludes(rulePathList: RuleTypes.RulePathList): boolean {
-    return rulePathList.includes(this.pathname);
+    return !rulePathList.includes(this.pathname);
   }
 }

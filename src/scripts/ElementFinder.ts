@@ -20,7 +20,12 @@ export default class ElementFinder {
   }
 
   private static query(xpath: string, multi: boolean): Array<Node> {
-    const fullXpath = 'div[@id="app"]/main[1]' + xpath;
+    let fullXpath: string;
+    if (xpath.startsWith('::')) {
+      fullXpath = xpath.slice(3);
+    } else {
+      fullXpath = 'div[@id="app"]/main[1]' + xpath;
+    }
 
     if (multi) {
       return this.querySelectorAll(fullXpath);
