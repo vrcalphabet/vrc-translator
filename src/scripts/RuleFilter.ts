@@ -20,10 +20,14 @@ export default class RuleFilter {
   }
 
   private includes(rulePathList: RuleTypes.RulePathList): boolean {
-    return rulePathList.includes(this.pathname);
+    return rulePathList.some((path) => this.testRegEx(path, this.pathname));
   }
 
   private excludes(rulePathList: RuleTypes.RulePathList): boolean {
-    return !rulePathList.includes(this.pathname);
+    return !this.includes(rulePathList);
+  }
+  
+  private testRegEx(regEx: RegExp, pathname: string): boolean {
+    return regEx.test(pathname);
   }
 }

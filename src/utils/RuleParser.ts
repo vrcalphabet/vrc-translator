@@ -1,5 +1,6 @@
 import { XprTypes, RuleTypes } from '../common';
 import RuleValidator from './RuleValidator';
+import escapeRegExp from 'escape-string-regexp';
 
 /** ツリー構造のノードを単純なノードの配列に変換するクラス */
 export default class RuleParser {
@@ -28,10 +29,20 @@ export default class RuleParser {
 
   private createRuleGroup(group: XprTypes.XprGroup): RuleTypes.RuleGroup {
     return {
-      includes: group.includes,
-      excludes: group.excludes,
+      includes: this.normalizePathList(group.includes),
+      excludes: this.normalizePathList(group.excludes),
       nodes: [],
     } satisfies RuleTypes.RuleGroup;
+  }
+
+  private normalizePathList(pathList: XprTypes.XprPathList): RuleTypes.RulePathList {
+    return pathList.map((path) => {
+      const pathRegEx = escapeRegExp(path)
+        .replaceAll('/@d', '/[\\w-]+?')
+        .replaceAll('/@p', '(/[\\w-]+?)+')
+        .replaceAll('/@f', '(/[\\w-]+?\\.\\w+?)?');
+      return new RegExp(`^${pathRegEx}$`);
+    });
   }
 
   private parseGroups(groups: XprTypes.Xpr): void {
