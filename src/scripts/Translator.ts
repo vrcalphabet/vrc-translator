@@ -10,6 +10,20 @@ export default class Translator {
   public translate(result: ResultTypes.Result): void {
     for (const resultNode of result) {
       this.translateResultNode(resultNode);
+      this.applyCustomResultNode(resultNode);
+    }
+  }
+  
+  private applyCustomResultNode(resultNode: ResultTypes.ResultNode): void {
+    if (resultNode.custom === null) return;
+    for (const node of resultNode.nodes) {
+      this.applyCustomNode(node, resultNode.custom);
+    }
+  }
+  
+  private applyCustomNode(node: Node, custom: string): void {
+    if (node instanceof HTMLElement) {
+      node.style.cssText += custom;
     }
   }
 
@@ -35,7 +49,7 @@ export default class Translator {
     } else if (attribute !== null) {
       (node as HTMLElement).setAttribute(attribute, newText);
     } else {
-      (node as HTMLElement).innerText = newText;
+      (node as HTMLElement).textContent = newText;
     }
   }
 
@@ -46,13 +60,17 @@ export default class Translator {
     } else if (attribute !== null) {
       text = (node as HTMLElement).getAttribute(attribute);
     } else {
-      text = (node as HTMLElement).innerText;
+      text = (node as HTMLElement).textContent;
     }
 
     return text ? text.trim() : null;
   }
 
   private findTrans(key: string, source: string): string | null {
+    if (!(key in this.trans)) {
+      console.error(`[${key}]の翻訳がありません！`);
+      return null;
+    }
     return this.findTransNodeList(this.trans[key], source);
   }
 

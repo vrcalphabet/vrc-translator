@@ -29,7 +29,7 @@ export default class PageTranslator {
     const filteredRule = this.ruleFilter.filter();
     const result = ElementFinder.find(filteredRule);
     this.translator.translate(result);
-    console.log(filteredRule);
-    console.log(result);
+    // console.log(filteredRule);
+    // console.log(result);
   }
 }
