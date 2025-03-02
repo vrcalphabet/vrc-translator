@@ -52,7 +52,7 @@ export default class Translator {
     } else if (attribute !== null) {
       (node as HTMLElement).setAttribute(attribute, newText);
     } else {
-      (node as HTMLElement).textContent = newText;
+      (node as HTMLElement).innerText = newText;
     }
   }
 
@@ -63,7 +63,7 @@ export default class Translator {
     } else if (attribute !== null) {
       text = (node as HTMLElement).getAttribute(attribute);
     } else {
-      text = (node as HTMLElement).textContent;
+      text = (node as HTMLElement).innerText;
     }
 
     return text ? text.trim().toLowerCase() : null;
