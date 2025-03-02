@@ -9,7 +9,8 @@ export default class Translator {
 
   public translate(result: ResultTypes.Result): void {
     for (const resultNode of result) {
-      if (!resultNode.key.startsWith('_')) {
+      // キーの先頭がアンダースコアでない場合のみ翻訳を行う
+      if (/.+\/[^_]\w+$/.test(resultNode.key)) {
         this.translateResultNode(resultNode);
       }
       this.applyCustomResultNode(resultNode);

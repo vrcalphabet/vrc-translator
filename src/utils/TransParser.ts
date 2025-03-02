@@ -58,7 +58,8 @@ export default class TransParser {
 
   private normalizeSource(source: string): string | RegExp {
     if (this.includesFormat(source)) {
-      return new RegExp(escapeRegExp(source).replaceAll('%s', '(.*?)').replaceAll('%S', '(.*)'));
+      const regex = escapeRegExp(source).replaceAll('%s', '(.*?)').replaceAll('%S', '(.*)');
+      return new RegExp(`^${regex}$`, 'i');
     }
     return source;
   }
