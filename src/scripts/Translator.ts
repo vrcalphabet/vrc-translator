@@ -9,7 +9,9 @@ export default class Translator {
 
   public translate(result: ResultTypes.Result): void {
     for (const resultNode of result) {
-      this.translateResultNode(resultNode);
+      if (!resultNode.key.startsWith('_')) {
+        this.translateResultNode(resultNode);
+      }
       this.applyCustomResultNode(resultNode);
     }
   }
