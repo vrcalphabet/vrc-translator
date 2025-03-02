@@ -1,6 +1,9 @@
 import { ResultTypes, RuleTypes } from '../common';
 
 export default class ElementFinder {
+  private static nsResolver: XPathNSResolver = (prefix) =>
+    prefix === 'svg' ? 'http://www.w3.org/2000/svg' : null;
+
   public static find(nodes: RuleTypes.RuleNodeList): ResultTypes.Result {
     const result: ResultTypes.Result = [];
 
@@ -48,6 +51,16 @@ export default class ElementFinder {
   }
 
   private static evaluate(xpath: string, type: number): XPathResult {
-    return document.evaluate(xpath, document.body, null, type, null);
+    return document.evaluate(
+      this.setSVGNamespace(xpath),
+      document.body,
+      this.nsResolver,
+      type,
+      null
+    );
+  }
+
+  private static setSVGNamespace(xpath: string): string {
+    return xpath.replace(/\/svg.+$/g, (m) => m.replaceAll(/(?<=\/)\w+/g, (m) => `svg:${m}`));
   }
 }
