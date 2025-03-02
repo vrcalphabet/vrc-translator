@@ -1,4 +1,5 @@
 import { TsrTypes, TransTypes } from '../common';
+import escapeRegExp from 'escape-string-regexp';
 
 /** ツリー構造の翻訳データを単純なキーと翻訳データの配列に変換するクラス */
 export default class TransParser {
@@ -48,6 +49,17 @@ export default class TransParser {
       this.trans[key] = [];
     }
 
-    this.trans[key].push({ source, trans });
+    this.trans[key].push({ source: this.normalizeSource(source), trans });
+  }
+
+  private includesFormat(source: string): boolean {
+    return source.includes('%s') || source.includes('%S');
+  }
+
+  private normalizeSource(source: string): string | RegExp {
+    if (this.includesFormat(source)) {
+      return new RegExp(escapeRegExp(source).replaceAll('%s', '(.*?)').replaceAll('%S', '(.*)'));
+    }
+    return source;
   }
 }

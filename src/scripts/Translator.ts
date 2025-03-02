@@ -13,14 +13,14 @@ export default class Translator {
       this.applyCustomResultNode(resultNode);
     }
   }
-  
+
   private applyCustomResultNode(resultNode: ResultTypes.ResultNode): void {
     if (resultNode.custom === null) return;
     for (const node of resultNode.nodes) {
       this.applyCustomNode(node, resultNode.custom);
     }
   }
-  
+
   private applyCustomNode(node: Node, custom: string): void {
     if (node instanceof HTMLElement) {
       node.style.cssText += custom;
@@ -39,10 +39,10 @@ export default class Translator {
 
     const trans = this.findTrans(key, text);
     if (trans === null) return;
-    
+
     this.setText(node, attribute, trans);
   }
-  
+
   private setText(node: Node, attribute: string | null, newText: string): void {
     if (node instanceof Text) {
       node.nodeValue = newText;
@@ -63,7 +63,7 @@ export default class Translator {
       text = (node as HTMLElement).textContent;
     }
 
-    return text ? text.trim() : null;
+    return text ? text.trim().toLowerCase() : null;
   }
 
   private findTrans(key: string, source: string): string | null {
@@ -86,10 +86,22 @@ export default class Translator {
   }
 
   private findTransNode(transNode: TransTypes.TransNode, source: string): string | null {
-    if (transNode.source === source.toLowerCase()) {
-      return transNode.trans;
-    } else {
-      return null;
+    if (transNode.source instanceof RegExp) {
+      const result = source.match(transNode.source);
+      if (result === null) return null;
+
+      return this.setCaptures(transNode.trans, result.slice(1));
     }
+
+    if (transNode.source === source) {
+      return transNode.trans;
+    }
+    return null;
+  }
+
+  private setCaptures(trans: string, captures: Array<string>): string {
+    return trans.replaceAll(/\$(\d)/g, (_, i) => {
+      return captures[i - 1];
+    });
   }
 }

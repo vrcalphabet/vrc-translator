@@ -3,6 +3,6 @@ export type Trans = {
 };
 export type TransNodeList = Array<TransNode>;
 export type TransNode = {
-  source: string,
+  source: string | RegExp,
   trans: string
 };
