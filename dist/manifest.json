@@ -2,7 +2,7 @@
   "$schema": "https://json.schemastore.org/chrome-manifest.json",
   "manifest_version": 3,
   "name": "vrc 公式サイト日本語化アドオン",
-  "version": "1.4",
+  "version": "1.5",
   "background": {
     "service_worker": "background.js"
   },
