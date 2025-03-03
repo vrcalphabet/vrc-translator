@@ -51,6 +51,8 @@ export default class Translator {
       node.nodeValue = newText;
     } else if (attribute !== null) {
       (node as HTMLElement).setAttribute(attribute, newText);
+    } else if (node instanceof SVGElement) {
+      (node as SVGElement).textContent = newText;
     } else {
       (node as HTMLElement).innerText = newText;
     }
@@ -62,6 +64,8 @@ export default class Translator {
       text = node.nodeValue;
     } else if (attribute !== null) {
       text = (node as HTMLElement).getAttribute(attribute);
+    } else if (node instanceof SVGElement) {
+      text = (node as SVGElement).textContent;
     } else {
       text = (node as HTMLElement).innerText;
     }
