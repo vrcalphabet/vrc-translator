@@ -5,7 +5,7 @@
   "description": "vrc 公式サイト日本語化プロジェクト",
   "main": "dist/background.js",
   "scripts": {
-    "compile": "npx webpack"
+    "build": "npx webpack"
   },
   "repository": {
     "type": "git",
