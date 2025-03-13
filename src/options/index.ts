@@ -9,7 +9,7 @@ async function initialize(): Promise<void> {
     await Storage.set('host', host.value || baseURL);
     alert('保存しました');
   });
-  
+
   host.value = await Storage.get('host', baseURL);
 }
 

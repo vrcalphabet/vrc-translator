@@ -1,16 +1,8 @@
-import { XprTypes, RuleTypes } from '../common';
+import { RuleTypes, XprTypes } from '../common';
 import RuleValidator from './RuleValidator';
-import escapeRegExp from 'escape-string-regexp';
 
 /** ツリー構造のノードを単純なノードの配列に変換するクラス */
 export default class RuleParser {
-  private static readonly INSTANCE = new RuleParser();
-  private constructor() {}
-
-  public static getInstance(): RuleParser {
-    return this.INSTANCE;
-  }
-
   /** 変換後のノードの配列の集合 */
   private rule!: RuleTypes.Rule;
 
@@ -23,78 +15,62 @@ export default class RuleParser {
     /** 変換後のノードの配列の集合 */
     this.rule = [];
     this.parseGroups(tree);
-    RuleValidator.validate(this.rule);
     return this.rule;
   }
 
   private createRuleGroup(group: XprTypes.XprGroup): RuleTypes.RuleGroup {
     return {
-      includes: this.normalizePathList(group.includes),
-      excludes: this.normalizePathList(group.excludes),
+      includes: RuleValidator.normalizePathList(group.includes),
+      excludes: RuleValidator.normalizePathList(group.excludes),
       nodes: [],
+      transKeys: RuleValidator.normalizeKeys(group.transKeys),
     } satisfies RuleTypes.RuleGroup;
-  }
-
-  private normalizePathList(pathList: XprTypes.XprPathList): RuleTypes.RulePathList {
-    return pathList.map((path) => {
-      const pathRegEx = escapeRegExp(path)
-        .replaceAll('/@d', '/[\\w-]+?')
-        .replaceAll('/@p', '(/[\\w-]+?)+')
-        .replaceAll('/@f', '(/[\\w-]+?\\.\\w+?)?');
-      return new RegExp(`^${pathRegEx}$`);
-    });
   }
 
   private parseGroups(groups: XprTypes.Xpr): void {
     for (const group of groups) {
       const ruleGroup = this.createRuleGroup(group);
       this.rule.push(ruleGroup);
-      this.parseGroup(group, ruleGroup, [group.name]);
+      this.parseGroup(group, ruleGroup);
     }
   }
 
-  private parseGroup(
-    group: XprTypes.XprGroup,
-    ruleGroup: RuleTypes.RuleGroup,
-    keyList: Array<string>
-  ): void {
-    this.parseNodes(group.nodes, ruleGroup.nodes, keyList, []);
+  private parseGroup(group: XprTypes.XprGroup, ruleGroup: RuleTypes.RuleGroup): void {
+    this.parseNodes(group.nodes, ruleGroup.nodes, ruleGroup.transKeys, []);
   }
 
   private parseNodes(
     nodes: XprTypes.XprNodeList,
     ruleNodeList: RuleTypes.RuleNodeList,
-    keyList: Array<string>,
+    transKeys: RuleTypes.RuleTransKeys,
     xpathList: Array<string>
   ): void {
     for (const node of nodes) {
-      this.parseNode(node, ruleNodeList, keyList, xpathList);
+      this.parseNode(node, ruleNodeList, transKeys, xpathList);
     }
   }
 
   private parseNode(
     node: XprTypes.XprParentNode | XprTypes.XprChildNode,
     ruleNodeList: RuleTypes.RuleNodeList,
-    keyList: Array<string>,
+    transKeys: RuleTypes.RuleTransKeys,
     xpathList: Array<string>
   ): void {
-    if (node.key !== null) keyList.push(node.key);
     xpathList.push(node.xpath);
 
     // typeof node === XprTypes.XprChildNode
-    if ('multi' in node) {
+    if ('key' in node) {
       ruleNodeList.push({
         ...node,
-        key: keyList.join('/'),
-        xpath: xpathList.join(''),
+        xpath: RuleValidator.validateXpath(xpathList.join('')),
+        transKeys: transKeys[node.key],
       });
     }
     // typeof node === XprTypes.XprParentNode
     else {
-      this.parseNodes(node.nodes, ruleNodeList, keyList, xpathList);
+      this.parseNodes(node.nodes, ruleNodeList, transKeys, xpathList);
     }
 
-    if (node.key !== null) keyList.pop();
     xpathList.pop();
   }
 }

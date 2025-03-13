@@ -7,7 +7,7 @@ import DataUpdater from './DataUpdater';
 async function initialize(): Promise<void> {
   console.log('拡張機能がアクティベートされました。');
 
-  if (await Storage.get('host') === undefined) {
+  if ((await Storage.get('host')) === undefined) {
     await Storage.set('host', 'https://vrcalphabet.github.io/vrc-transition/');
   }
 

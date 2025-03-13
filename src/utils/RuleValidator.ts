@@ -1,27 +1,23 @@
-import { RuleTypes } from '../common';
+import escapeRegExp from 'escape-string-regexp';
+import { RuleTypes, XprTypes } from '../common';
+import KeysParser from './KeysParser';
 
 export default class RuleValidator {
-  public static validate(rule: RuleTypes.Rule): void {
-    for (const ruleGroup of rule) {
-      this.validateGroup(ruleGroup);
-    }
+  public static normalizePathList(pathList: XprTypes.XprPathList): RuleTypes.RulePathList {
+    return pathList.map((path) => {
+      const pathRegEx = escapeRegExp(path)
+        .replaceAll('/@d', '/[\\w-]+?')
+        .replaceAll('/@p', '(/[\\w-]+?)+')
+        .replaceAll('/@f', '(/[\\w-]+?\\.\\w+?)?');
+      return new RegExp(`^${pathRegEx}$`);
+    });
   }
 
-  private static validateGroup(ruleGroup: RuleTypes.RuleGroup): void {
-    this.validateNodes(ruleGroup.nodes);
+  public static normalizeKeys(keys: XprTypes.XprTransKeys): RuleTypes.RuleTransKeys {
+    return new KeysParser().parse(keys);
   }
 
-  private static validateNodes(nodes: RuleTypes.RuleNodeList): void {
-    for (const node of nodes) {
-      this.validateNode(node);
-    }
-  }
-
-  private static validateNode(node: RuleTypes.RuleNode): void {
-    node.xpath = this.validateXpath(node.xpath);
-  }
-
-  private static validateXpath(xpath: string): string {
+  public static validateXpath(xpath: string): string {
     const result: string[] = [];
 
     // 識別子と条件で別々のトークンに分ける

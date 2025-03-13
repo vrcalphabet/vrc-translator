@@ -1,4 +1,4 @@
-import { ResultTypes, TransTypes } from '../common';
+import { LocalizedResultTypes, TransTypes } from '../common';
 
 export default class Translator {
   private trans: TransTypes.Trans;
@@ -7,108 +7,33 @@ export default class Translator {
     this.trans = trans;
   }
 
-  public translate(result: ResultTypes.Result): void {
+  public translate(result: LocalizedResultTypes.LocalizedResult): void {
     for (const resultNode of result) {
-      // キーの先頭がアンダースコアでない場合のみ翻訳を行う
-      if (/.+\/[^_]\w+$/.test(resultNode.key)) {
-        this.translateResultNode(resultNode);
-      }
-      this.applyCustomResultNode(resultNode);
+      this.translateNode(resultNode);
     }
   }
 
-  private applyCustomResultNode(resultNode: ResultTypes.ResultNode): void {
-    if (resultNode.custom === null) return;
-    for (const node of resultNode.nodes) {
-      this.applyCustomNode(node, resultNode.custom);
-    }
+  private translateNode(node: LocalizedResultTypes.LocalizedResultNode): void {
+    const trans = this.getTransByKey(node.key, node.placeholder);
+    this.setText(node.node, node.attribute, trans);
   }
 
-  private applyCustomNode(node: Node, custom: string): void {
-    if (node instanceof HTMLElement) {
-      node.style.cssText += custom;
-    }
-  }
-
-  private translateResultNode(resultNode: ResultTypes.ResultNode): void {
-    for (const node of resultNode.nodes) {
-      this.translateNode(node, resultNode.key, resultNode.attribute);
-    }
-  }
-
-  private translateNode(node: Node, key: string, attribute: string | null): void {
-    const text = this.getText(node, attribute);
-    if (text === null) return;
-
-    const trans = this.findTrans(key, text);
-    if (trans === null) return;
-
-    this.setText(node, attribute, trans);
-  }
-
-  private setText(node: Node, attribute: string | null, newText: string): void {
-    if (node instanceof Text) {
-      node.nodeValue = newText;
-    } else if (attribute !== null) {
-      (node as HTMLElement).setAttribute(attribute, newText);
-    } else if (node instanceof SVGElement) {
-      (node as SVGElement).textContent = newText;
-    } else {
-      (node as HTMLElement).innerText = newText;
-    }
-  }
-
-  private getText(node: Node, attribute: string | null): string | null {
-    let text: string | null;
-    if (node instanceof Text) {
-      text = node.nodeValue;
-    } else if (attribute !== null) {
-      text = (node as HTMLElement).getAttribute(attribute);
-    } else if (node instanceof SVGElement) {
-      text = (node as SVGElement).textContent;
-    } else {
-      text = (node as HTMLElement).innerText;
-    }
-
-    return text ? text.trim().toLowerCase() : null;
-  }
-
-  private findTrans(key: string, source: string): string | null {
-    if (!(key in this.trans)) {
-      console.error(`[${key}]の翻訳がありません！`);
-      return null;
-    }
-    return this.findTransNodeList(this.trans[key], source);
-  }
-
-  private findTransNodeList(
-    transNodeList: TransTypes.TransNodeList,
-    source: string
-  ): string | null {
-    for (const transNode of transNodeList) {
-      const trans = this.findTransNode(transNode, source);
-      if (trans !== null) return trans;
-    }
-    return null;
-  }
-
-  private findTransNode(transNode: TransTypes.TransNode, source: string): string | null {
-    if (transNode.source instanceof RegExp) {
-      const result = source.match(transNode.source);
-      if (result === null) return null;
-
-      return this.setCaptures(transNode.trans, result.slice(1));
-    }
-
-    if (transNode.source === source) {
-      return transNode.trans;
-    }
-    return null;
-  }
-
-  private setCaptures(trans: string, captures: Array<string>): string {
-    return trans.replaceAll(/\$(\d)/g, (_, i) => {
-      return captures[i - 1];
+  private getTransByKey(key: string, placeholder: { [key: string]: string }): string {
+    const trans = this.trans[key];
+    return trans.replaceAll(/\{\{\w+\}\}/g, (key) => {
+      return placeholder[key.slice(2, -2)] ?? key;
     });
+  }
+
+  private setText(node: Node, attribute: string | null, trans: string): void {
+    if (node instanceof Text) {
+      node.nodeValue = trans;
+    } else if (attribute !== null) {
+      (node as HTMLElement).setAttribute(attribute, trans);
+    } else if (node instanceof SVGElement) {
+      (node as SVGElement).textContent = trans;
+    } else {
+      (node as HTMLElement).innerText = trans;
+    }
   }
 }

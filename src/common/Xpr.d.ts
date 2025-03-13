@@ -1,17 +1,19 @@
 export type Xpr = Array<XprGroup>;
 export type XprGroup = {
-  name: string;
   includes: XprPathList;
   excludes: XprPathList;
   nodes: XprNodeList;
+  transKeys: XprTransKeys;
+};
+export type XprTransKeys = {
+  [transKey: string]: XprTransKeys | string;
 };
 export type XprParentNode = {
-  key: string;
   xpath: string;
   nodes: XprNodeList;
 };
 export type XprChildNode = {
-  key: string | null;
+  key: string;
   xpath: string;
   multi: boolean;
   attribute: string | null;

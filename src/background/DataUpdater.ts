@@ -1,12 +1,12 @@
-import FileRetriever from './FileRetriever';
 import Storage from '../utils/Storage';
+import FileRetriever from './FileRetriever';
 
 export default class DataUpdater {
   private static baseURL: string;
-  
+
   public static async checkUpdate(): Promise<void> {
     this.baseURL = (await Storage.get('host'))!;
-    
+
     /** 更新が必要かどうか */
     const needsUpdate = await this.needsUpdate();
     if (needsUpdate) {
@@ -48,14 +48,11 @@ export default class DataUpdater {
   private static async update(): Promise<boolean> {
     const lastUpdate = await FileRetriever.getLastUpdate(this.baseURL);
     if (lastUpdate === null) return false;
-    const rule = await FileRetriever.getRule(this.baseURL);
-    if (rule === null) return false;
-    const trans = await FileRetriever.getTrans(this.baseURL);
-    if (trans === null) return false;
+    const data = await FileRetriever.getData(this.baseURL);
+    if (data === null) return false;
 
     Storage.set('lastUpdate', lastUpdate);
-    Storage.set('rule', rule);
-    Storage.set('trans', trans);
+    Storage.set('data', data);
 
     console.log('データを更新しました。');
 

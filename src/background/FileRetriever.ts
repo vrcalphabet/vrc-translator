@@ -17,16 +17,8 @@ export default class FileRetriever {
    * 最新の翻訳データをサーバから取得します。
    * @returns 翻訳データ
    */
-  public static async getTrans(baseURL: string): Promise<string | null> {
-    return this.getContent(baseURL, 'trans.json');
-  }
-
-  /**
-   * 最新のルールデータをサーバから取得します。
-   * @returns ルールデータ
-   */
-  public static async getRule(baseURL: string): Promise<string | null> {
-    return this.getContent(baseURL, 'rule.json');
+  public static async getData(baseURL: string): Promise<string | null> {
+    return this.getContent(baseURL, 'data.json');
   }
 
   /**
@@ -38,9 +30,10 @@ export default class FileRetriever {
     this.timeLogger.start(fileName);
 
     const url = this.getURL(baseURL, fileName);
-    const res = await fetch(url, { cache: 'no-cache' });
-    // ファイルが存在しない場合
-    if (!res.ok) {
+    let res: Response;
+    try {
+      res = await fetch(url, { cache: 'no-cache' });
+    } catch (e) {
       console.error(`${fileName} をサーバから取得できませんでした。`);
       return null;
     }

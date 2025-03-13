@@ -1,7 +1,8 @@
 import DataParser from '../utils/DataParser';
-import RuleFilter from './RuleFilter';
 import DomObserver from './DomObserver';
 import ElementFinder from './ElementFinder';
+import RuleFilter from './RuleFilter';
+import Source2Key from './Source2Key';
 import Translator from './Translator';
 
 export default class PageTranslator {
@@ -9,16 +10,12 @@ export default class PageTranslator {
   private translator!: Translator;
 
   public async initialize(): Promise<void> {
-    const ruleData = await DataParser.parseRule();
-    if (ruleData === null) return;
-    const transData = await DataParser.parseTrans();
-    if (transData === null) return;
+    const data = await DataParser.parse();
+    if (data === null) return;
 
-    console.log(ruleData);
-    console.log(transData);
-
-    this.ruleFilter = new RuleFilter(ruleData);
-    this.translator = new Translator(transData);
+    console.log(data);
+    this.ruleFilter = new RuleFilter(data.rules);
+    this.translator = new Translator(data.trans);
   }
 
   public observe(): void {
@@ -28,8 +25,9 @@ export default class PageTranslator {
   private domChanged(): void {
     const filteredRule = this.ruleFilter.filter();
     const result = ElementFinder.find(filteredRule);
-    this.translator.translate(result);
-    // console.log(filteredRule);
-    // console.log(result);
+    const sourceKey = new Source2Key().parse(result);
+    this.translator.translate(sourceKey);
+    console.log(result);
+    console.log(sourceKey);
   }
 }
